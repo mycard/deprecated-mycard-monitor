@@ -4,9 +4,9 @@ try
   settings = require './config.json'
 catch
   settings = {
-    interval: parseInt process.env.inteval
+    interval: parseInt process.env.interval
     database: process.env.database
-    port: process.env.port
+    port: parseInt process.env.port
     mail: {
       service: process.env.mail_service
       auth: {
