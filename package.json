@@ -1,6 +1,6 @@
 {
     "name": "mycard-monitor",
-    "subdomain": "mycard-monitor"
+    "subdomain": "mycard-monitor",
     "version": "0.1.1",
     "author": "zh99998 <zh99998@gmail.com>",
     "description": "high customization web service monitor",
