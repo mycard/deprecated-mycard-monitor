@@ -1,4 +1,23 @@
-settings = require './config.json'
+try
+  settings = require './config.json'
+catch
+  settings = {
+    interval: parseInt process.env.inteval
+    database: process.env.database
+    mail: {
+      service: process.env.mail_service
+      auth: {
+        user: process.env.mail_auth_user
+        pass: process.env.mail_auth_pass
+      }
+    }
+    xmpp: {
+      jid: process.env.xmpp_jid
+      password: process.env.xmpp_password
+    }
+  }
+
+
 
 url = require 'url'
 net = require 'net'

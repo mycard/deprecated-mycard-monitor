@@ -2,7 +2,25 @@
 (function() {
   var MongoClient, WebSocketClient, dns, http, net, nodemailer, request, settings, smtp, url, xmpp, xmpp_client;
 
-  settings = require('./config.json');
+  try {
+    settings = require('./config.json');
+  } catch (_error) {
+    settings = {
+      interval: parseInt(process.env.inteval),
+      database: process.env.database,
+      mail: {
+        service: process.env.mail_service,
+        auth: {
+          user: process.env.mail_auth_user,
+          pass: process.env.mail_auth_pass
+        }
+      },
+      xmpp: {
+        jid: process.env.xmpp_jid,
+        password: process.env.xmpp_password
+      }
+    };
+  }
 
   url = require('url');
 
