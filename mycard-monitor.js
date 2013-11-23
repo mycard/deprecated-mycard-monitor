@@ -138,7 +138,9 @@
         }
       }
     };
+    console.log(apps_collection, apps_collection.find(), 1);
     setInterval(function() {
+      console.log(apps_collection, apps_collection.find(), 2);
       return apps_collection.find().toArray(function(err, apps) {
         return apps.forEach(function(app) {
           var client, dnsquery, key, question, url_parsed, value, _i, _len, _ref, _ref1;
