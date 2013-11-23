@@ -6,7 +6,7 @@ catch
     database: process.env.database
     mail: {
       service: process.env.mail_service
-      auth: {
+      auth: { 
         user: process.env.mail_auth_user
         pass: process.env.mail_auth_pass
       }
