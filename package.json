@@ -1,0 +1,31 @@
+{
+    "name": "mycard-monitor",
+    "version": "0.1.1",
+    "author": "zh99998 <zh99998@gmail.com>",
+    "description": "high customization web service monitor ",
+    "main": "mycard-monitor.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mycard/mycard-monitor.git"
+    },
+    "keywords": [
+        "monitor"
+    ],
+    "scripts": {
+        "start": "node mycard-monitor.js"
+    },
+    "dependencies": {
+        "mongodb": "*",
+        "nodemailer": "*",
+        "node-stringprep": "*",
+        "node-xmpp": "*",
+        "request": "*",
+        "websocket": "*",
+        "native-dns": "*"
+    },
+    "license": "GPLv3",
+    "engines": {
+        "node": "*"
+    },
+    "subdomain": "mycard-monitor"
+}
