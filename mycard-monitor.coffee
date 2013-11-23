@@ -1,12 +1,15 @@
+settings = null
+
 try
   settings = require './config.json'
 catch
   settings = {
     interval: parseInt process.env.inteval
     database: process.env.database
+    port: process.env.port
     mail: {
       service: process.env.mail_service
-      auth: { 
+      auth: {
         user: process.env.mail_auth_user
         pass: process.env.mail_auth_pass
       }
@@ -17,7 +20,7 @@ catch
     }
   }
 
-
+console.log settings
 
 url = require 'url'
 net = require 'net'
@@ -94,7 +97,6 @@ MongoClient.connect settings.database, (err, db)->
 
   setInterval ->
     apps_collection.find().toArray (err, apps)->
-      console.log apps
       apps.forEach (app)->
         url_parsed = url.parse app.url
         switch url_parsed.protocol
@@ -165,4 +167,4 @@ MongoClient.connect settings.database, (err, db)->
   http.createServer (req, res)->
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end('nya');
-  .listen(settings.http_port);
+  .listen(settings.port);

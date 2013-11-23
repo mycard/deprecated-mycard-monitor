@@ -2,12 +2,15 @@
 (function() {
   var MongoClient, WebSocketClient, dns, http, net, nodemailer, request, settings, smtp, url, xmpp, xmpp_client;
 
+  settings = null;
+
   try {
     settings = require('./config.json');
   } catch (_error) {
     settings = {
       interval: parseInt(process.env.inteval),
       database: process.env.database,
+      port: process.env.port,
       mail: {
         service: process.env.mail_service,
         auth: {
@@ -21,6 +24,8 @@
       }
     };
   }
+
+  console.log(settings);
 
   url = require('url');
 
@@ -135,7 +140,6 @@
     };
     setInterval(function() {
       return apps_collection.find().toArray(function(err, apps) {
-        console.log(apps);
         return apps.forEach(function(app) {
           var client, dnsquery, key, question, url_parsed, value, _i, _len, _ref, _ref1;
           url_parsed = url.parse(app.url);
@@ -227,7 +231,7 @@
         'Content-Type': 'text/plain'
       });
       return res.end('nya');
-    }).listen(settings.http_port);
+    }).listen(settings.port);
   });
 
 }).call(this);
