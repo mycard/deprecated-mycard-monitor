@@ -16,13 +16,13 @@
         "start": "node mycard-monitor.js"
     },
     "dependencies": {
-        "mongodb": "*",
-        "nodemailer": "*",
-        "node-stringprep": "*",
-        "node-xmpp": "*",
-        "request": "*",
-        "websocket": "*",
-        "native-dns": "*"
+        "mongodb": "~1.3.20",
+        "nodemailer": "~0.5.8",
+        "node-stringprep": "~0.1.8",
+        "node-xmpp": "~0.10.7",
+        "request": "~2.27.0",
+        "websocket": "~1.0.8",
+        "native-dns": "~0.4.1"
     },
     "license": "GPLv3",
     "engines": {

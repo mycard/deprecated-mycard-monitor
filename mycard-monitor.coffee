@@ -95,9 +95,9 @@ MongoClient.connect settings.database, (err, db)->
         apps_collection.update {_id:app._id}, {$inc:{retries:1}}, (err)->
           throw err if err
 
-  console.log apps_collection, apps_collection.find(),1
+  console.log apps_collection, apps_collection.find(), 1
+  console.log apps_collection, apps_collection.find()(), 2
   setInterval ->
-    console.log apps_collection, apps_collection.find(),2
     apps_collection.find().toArray (err, apps)->
       apps.forEach (app)->
         url_parsed = url.parse app.url
