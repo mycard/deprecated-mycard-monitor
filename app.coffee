@@ -63,7 +63,8 @@ MongoClient.connect settings.database, (err, db)->
   pages_collection = db.collection('pages')
 
   #监控记录
-  log = (app, alive, message)->
+  record = (app, alive, message)->
+    message = message.toString()
     console.log "#{app.name} #{alive} #{message}"
 
     #存活，清空重试次数
@@ -74,8 +75,6 @@ MongoClient.connect settings.database, (err, db)->
     #存活状态变更
     if alive != app.alive
       date = new Date()
-      logs_collection.insert {app: app._id, alive: alive, message: message, created_at: date}, (err)->
-        throw err if err
 
       if alive #上线
         console.log "#{app.name} up #{message}"
@@ -94,6 +93,8 @@ MongoClient.connect settings.database, (err, db)->
         xmpp_client.send(stanza)
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive, retries:0}}, (err)->
+          throw err if err
+        logs_collection.insert {app: app._id, alive: alive, message: message, created_at: date}, (err)->
           throw err if err
 
       else if app.retries >= 5 #下线
@@ -115,6 +116,8 @@ MongoClient.connect settings.database, (err, db)->
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive}}, (err)->
           throw err if err
+        logs_collection.insert {app: app._id, alive: alive, message: message, created_at: date}, (err)->
+          throw err if err
 
       else #重试
         console.log "#{app.name} retry#{app.retries} #{message}"
@@ -132,11 +135,11 @@ MongoClient.connect settings.database, (err, db)->
           when 'ws:', 'wss:'
             client = new WebSocketClient()
             client.on "connectFailed", (error) ->
-              log(app, false, error)
+              record(app, false, error)
 
             client.on "connect", (connection) ->
               connection.close()
-              log(app, true, "WebSocket连接成功")
+              record(app, true, "WebSocket连接成功")
 
             client.connect app.url
           when 'http:', 'https:'
@@ -147,11 +150,11 @@ MongoClient.connect settings.database, (err, db)->
               headers: app.headers
             , (err, response, body)->
               if err #http失败
-                log(app, false, err)
+                record(app, false, err)
               else if response.statusCode >= 400 #http成功，但返回了4xx或5xx
-                log(app, false, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
+                record(app, false, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
               else #ok
-                log(app, true, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
+                record(app, true, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
           when 'xmpp:'
           #client = new xmpp.Client()
           #client.on 'error', (error)->
@@ -160,9 +163,9 @@ MongoClient.connect settings.database, (err, db)->
           when 'tcp:'
             client = net.connect port:url_parsed.port, host:url_parsed.hostname, ->
               client.end()
-              log(app, true, "TCP连接成功")
+              record(app, true, "TCP连接成功")
             client.on 'error', (error)->
-              log(app, false, error)
+              record(app, false, error)
           when 'dns:'
             question = dns.Question
               name: url_parsed.pathname.slice(1)
@@ -172,7 +175,7 @@ MongoClient.connect settings.database, (err, db)->
 
             dns.lookup url_parsed.host, 4, (err, address, family)->
               if err
-                log(app, false, "NS #{url_parsed.host} 解析失败: #{err}")
+                record(app, false, "NS #{url_parsed.host} 解析失败: #{err}")
               else
                 req = dns.Request({
                   question: question,
@@ -180,13 +183,13 @@ MongoClient.connect settings.database, (err, db)->
                   timeout: 10000,
                 });
                 req.on 'timeout', ()->
-                  log(app, false, "DNS 请求超时")
+                  record(app, false, "DNS 请求超时")
 
                 req.on 'message', (err, answer)->
                   if answer.answer.length
-                    log(app, true, answer.answer[0].data)
+                    record(app, true, answer.answer[0].data)
                   else
-                    log(app, false, "DNS 查询结果为空")
+                    record(app, false, "DNS 查询结果为空")
 
                 req.send()
           else
@@ -200,11 +203,21 @@ MongoClient.connect settings.database, (err, db)->
     pages_collection.findOne domain: req.headers.host, (err, page)->
       throw err if err
       if page
-        apps = apps_collection.find _id: {$in: page.apps}, (err, apps)->
+        apps = apps_collection.find(_id: {$in: page.apps}).toArray (err, apps)->
           throw err if err
-          logs = logs_collection.find app: {$in: page.apps}, (err, apps)->
+          logs = logs_collection.find(app: {$in: page.apps}).sort({created_at: -1}).limit(10).toArray (err, logs)->
             throw err if err
-              res.render 'page', { page: page, apps: apps, logs: logs, title: 'req' }
+            alive = true
+            for app in apps
+              if !app.alive
+                alive = false
+                break
+            for log in logs
+              for app in apps
+                if app._id.equals log.app
+                  log.app = app
+                  break
+            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive}
       else
         res.render 'index', { title: 'mycard-monitor' }
 

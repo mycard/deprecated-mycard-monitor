@@ -78,15 +78,16 @@
   }
 
   MongoClient.connect(settings.database, function(err, db) {
-    var apps_collection, log, logs_collection, pages_collection;
+    var apps_collection, logs_collection, pages_collection, record;
     if (err) {
       throw err;
     }
     apps_collection = db.collection('apps');
     logs_collection = db.collection('logs');
     pages_collection = db.collection('pages');
-    log = function(app, alive, message) {
+    record = function(app, alive, message) {
       var date, stanza;
+      message = message.toString();
       console.log("" + app.name + " " + alive + " " + message);
       if (alive && app.alive && app.retries) {
         apps_collection.update({
@@ -103,16 +104,6 @@
       }
       if (alive !== app.alive) {
         date = new Date();
-        logs_collection.insert({
-          app: app._id,
-          alive: alive,
-          message: message,
-          created_at: date
-        }, function(err) {
-          if (err) {
-            throw err;
-          }
-        });
         if (alive) {
           console.log("" + app.name + " up " + message);
           smtp.sendMail({
@@ -127,13 +118,23 @@
             type: 'chat'
           }).c('body').t("" + app.name + " 恢复可用 (" + message + ")");
           xmpp_client.send(stanza);
-          return apps_collection.update({
+          apps_collection.update({
             _id: app._id
           }, {
             $set: {
               alive: alive,
               retries: 0
             }
+          }, function(err) {
+            if (err) {
+              throw err;
+            }
+          });
+          return logs_collection.insert({
+            app: app._id,
+            alive: alive,
+            message: message,
+            created_at: date
           }, function(err) {
             if (err) {
               throw err;
@@ -153,12 +154,22 @@
             type: 'chat'
           }).c('body').t("" + app.name + " 不可用 (" + message + ")");
           xmpp_client.send(stanza);
-          return apps_collection.update({
+          apps_collection.update({
             _id: app._id
           }, {
             $set: {
               alive: alive
             }
+          }, function(err) {
+            if (err) {
+              throw err;
+            }
+          });
+          return logs_collection.insert({
+            app: app._id,
+            alive: alive,
+            message: message,
+            created_at: date
           }, function(err) {
             if (err) {
               throw err;
@@ -193,11 +204,11 @@
             case 'wss:':
               client = new WebSocketClient();
               client.on("connectFailed", function(error) {
-                return log(app, false, error);
+                return record(app, false, error);
               });
               client.on("connect", function(connection) {
                 connection.close();
-                return log(app, true, "WebSocket连接成功");
+                return record(app, true, "WebSocket连接成功");
               });
               return client.connect(app.url);
             case 'http:':
@@ -209,11 +220,11 @@
                 headers: app.headers
               }, function(err, response, body) {
                 if (err) {
-                  return log(app, false, err);
+                  return record(app, false, err);
                 } else if (response.statusCode >= 400) {
-                  return log(app, false, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
+                  return record(app, false, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
                 } else {
-                  return log(app, true, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
+                  return record(app, true, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
                 }
               });
             case 'xmpp:':
@@ -224,10 +235,10 @@
                 host: url_parsed.hostname
               }, function() {
                 client.end();
-                return log(app, true, "TCP连接成功");
+                return record(app, true, "TCP连接成功");
               });
               return client.on('error', function(error) {
-                return log(app, false, error);
+                return record(app, false, error);
               });
             case 'dns:':
               question = dns.Question({
@@ -242,7 +253,7 @@
               return dns.lookup(url_parsed.host, 4, function(err, address, family) {
                 var req, _ref2;
                 if (err) {
-                  return log(app, false, "NS " + url_parsed.host + " 解析失败: " + err);
+                  return record(app, false, "NS " + url_parsed.host + " 解析失败: " + err);
                 } else {
                   req = dns.Request({
                     question: question,
@@ -254,13 +265,13 @@
                     timeout: 10000
                   });
                   req.on('timeout', function() {
-                    return log(app, false, "DNS 请求超时");
+                    return record(app, false, "DNS 请求超时");
                   });
                   req.on('message', function(err, answer) {
                     if (answer.answer.length) {
-                      return log(app, true, answer.answer[0].data);
+                      return record(app, true, answer.answer[0].data);
                     } else {
-                      return log(app, false, "DNS 查询结果为空");
+                      return record(app, false, "DNS 查询结果为空");
                     }
                   });
                   return req.send();
@@ -285,7 +296,7 @@
             _id: {
               $in: page.apps
             }
-          }, function(err, apps) {
+          }).toArray(function(err, apps) {
             var logs;
             if (err) {
               throw err;
@@ -294,13 +305,37 @@
               app: {
                 $in: page.apps
               }
-            }, function(err, apps) {
-              throw err(err ? res.render('page', {
+            }).sort({
+              created_at: -1
+            }).limit(10).toArray(function(err, logs) {
+              var alive, log, _i, _j, _k, _len, _len1, _len2;
+              if (err) {
+                throw err;
+              }
+              alive = true;
+              for (_i = 0, _len = apps.length; _i < _len; _i++) {
+                app = apps[_i];
+                if (!app.alive) {
+                  alive = false;
+                  break;
+                }
+              }
+              for (_j = 0, _len1 = logs.length; _j < _len1; _j++) {
+                log = logs[_j];
+                for (_k = 0, _len2 = apps.length; _k < _len2; _k++) {
+                  app = apps[_k];
+                  if (app._id.equals(log.app)) {
+                    log.app = app;
+                    break;
+                  }
+                }
+              }
+              return res.render('page', {
                 page: page,
                 apps: apps,
                 logs: logs,
-                title: 'req'
-              }) : void 0);
+                alive: alive
+              });
             });
           });
         } else {

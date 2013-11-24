@@ -7,16 +7,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> {{page}}</title>
+    <title>{{page.name}} - status</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../../dist/css/bootstrap.css" rel="stylesheet">
+    <link href="stylesheets/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="jumbotron-narrow.css" rel="stylesheet">
-
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <link href="stylesheets/style.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -30,45 +27,39 @@
 <div class="container">
     <div class="header">
         <ul class="nav nav-pills pull-right">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="https://my-card.in/">首页</a></li>
+            <li class="active"><a href="#">状态</a></li>
         </ul>
-        <h3 class="text-muted">Project name</h3>
+        <h3 class="text-muted">{{page.name}}</h3>
     </div>
 
     <div class="jumbotron">
-        <h1>Jumbotron heading</h1>
-        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
+        {{#alive}}
+            <h1><span class="glyphicon glyphicon-ok"></span>{{page.name}} 服务正常</h1>
+        {{/alive}}
+        {{^alive}}
+            <h1><span class="glyphicon glyphicon-remove"></span>{{page.name}} 服务异常</h1>
+        {{/alive}}
+    </div>
+    <div id="apps" class="btn-group btn-group-lg btn-group-justified">
+        {{#apps}}
+            <a type="button" class="btn {{#alive}}btn-success{{/alive}}{{^alive}}btn-danger{{/alive}}">{{name}}</a>
+        {{/apps}}
     </div>
 
-    <div class="row marketing">
-        <div class="col-lg-6">
-            <h4>Subheading</h4>
-            <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-            <h4>Subheading</h4>
-            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-            <h4>Subheading</h4>
-            <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-
-        <div class="col-lg-6">
-            <h4>Subheading</h4>
-            <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-            <h4>Subheading</h4>
-            <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-            <h4>Subheading</h4>
-            <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
+    <div>
+        {{#logs}}
+            {{#alive}}
+                <div class="alert alert-success"><a href="#" class="alert-link">{{app.name}}</a> 恢复可用 ({{message}}) {{created_at}}</div>
+            {{/alive}}
+            {{^alive}}
+                <div class="alert alert-danger"><a href="#" class="alert-link">{{app.name}}</a> 不可用 ({{message}}) {{created_at}}</div>
+            {{/alive}}
+        {{/logs}}
     </div>
 
     <div class="footer">
-        <p>&copy; Company 2013</p>
+        <p>&copy; 萌卡监控 2013</p>
     </div>
 
 </div> <!-- /container -->
@@ -77,5 +68,7 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
+<script src="javascripts/jquery-2.0.3.min.js"></script>
+<script src="javascripts/bootstrap.min.js"></script>
 </body>
 </html>
