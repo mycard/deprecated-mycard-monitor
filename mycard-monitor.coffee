@@ -96,8 +96,9 @@ MongoClient.connect settings.database, (err, db)->
           throw err if err
 
   setInterval ->
-    apps_collection.find().toArray (err, apps)->
-      apps.forEach (app)->
+    apps_collection.find().each (err, app)->
+      throw err if err
+      if app
         url_parsed = url.parse app.url
         switch url_parsed.protocol
           when 'ws:', 'wss:'
@@ -115,6 +116,7 @@ MongoClient.connect settings.database, (err, db)->
               url: app.url
               timeout: 10000
               strictSSL: true
+              headers: app.headers
             , (err, response, body)->
               if err #http失败
                 log(app, false, err)
@@ -132,7 +134,7 @@ MongoClient.connect settings.database, (err, db)->
               client.end()
               log(app, true, "TCP连接成功")
             client.on 'error', (error)->
-              log(app, false, "error")
+              log(app, false, error)
           when 'dns:'
             question = dns.Question
               name: url_parsed.pathname.slice(1)
@@ -147,7 +149,7 @@ MongoClient.connect settings.database, (err, db)->
                 req = dns.Request({
                   question: question,
                   server: { address: address, port: url_parsed.port ? 53, type: 'udp' },
-                  timeout: 2000,
+                  timeout: 10000,
                 });
                 req.on 'timeout', ()->
                   log(app, false, "DNS 请求超时")

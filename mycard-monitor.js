@@ -139,9 +139,12 @@
       }
     };
     setInterval(function() {
-      return apps_collection.find().toArray(function(err, apps) {
-        return apps.forEach(function(app) {
-          var client, dnsquery, key, question, url_parsed, value, _i, _len, _ref, _ref1;
+      return apps_collection.find().each(function(err, app) {
+        var client, dnsquery, key, question, url_parsed, value, _i, _len, _ref, _ref1;
+        if (err) {
+          throw err;
+        }
+        if (app) {
           url_parsed = url.parse(app.url);
           switch (url_parsed.protocol) {
             case 'ws:':
@@ -160,7 +163,8 @@
               return request({
                 url: app.url,
                 timeout: 10000,
-                strictSSL: true
+                strictSSL: true,
+                headers: app.headers
               }, function(err, response, body) {
                 if (err) {
                   return log(app, false, err);
@@ -181,7 +185,7 @@
                 return log(app, true, "TCP连接成功");
               });
               return client.on('error', function(error) {
-                return log(app, false, "error");
+                return log(app, false, error);
               });
             case 'dns:':
               question = dns.Question({
@@ -205,7 +209,7 @@
                       port: (_ref2 = url_parsed.port) != null ? _ref2 : 53,
                       type: 'udp'
                     },
-                    timeout: 2000
+                    timeout: 10000
                   });
                   req.on('timeout', function() {
                     return log(app, false, "DNS 请求超时");
@@ -223,7 +227,7 @@
             default:
               throw "unsupported procotol " + app.url;
           }
-        });
+        }
       });
     }, settings.interval);
     return http.createServer(function(req, res) {
