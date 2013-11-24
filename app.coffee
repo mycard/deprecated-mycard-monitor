@@ -213,6 +213,7 @@ MongoClient.connect settings.database, (err, db)->
                 alive = false
                 break
             for log in logs
+              log.created_at_humane = log.created_at.toLocaleString()
               for app in apps
                 if app._id.equals log.app
                   log.app = app
