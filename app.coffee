@@ -1,12 +1,27 @@
-settings = null
+#标准库
+path = require "path"
+url = require 'url'
+net = require 'net'
+http = require 'http'
 
+#三方库
+express = require "express"
+request = require 'request'
+nodemailer = require "nodemailer"
+xmpp = require 'node-xmpp'
+dns = require 'native-dns'
+WebSocketClient = require("websocket").client
+MongoClient = require('mongodb').MongoClient
+
+#本地
+settings = null
 try
   settings = require './config.json'
 catch
   settings = {
     interval: parseInt process.env.interval
     database: process.env.database
-    port: parseInt process.env.port
+    port: parseInt process.env.PORT
     mail: {
       service: process.env.mail_service
       auth: {
@@ -20,81 +35,94 @@ catch
     }
   }
 
-console.log settings
-
-url = require 'url'
-net = require 'net'
-http = require 'http'
-
-request = require 'request'
-nodemailer = require "nodemailer"
-xmpp = require 'node-xmpp'
-dns = require 'native-dns'
-WebSocketClient = require("websocket").client
-MongoClient = require('mongodb').MongoClient
-
 smtp = nodemailer.createTransport "SMTP",settings.mail
-
 xmpp_client = new xmpp.Client(settings.xmpp)
+app = express()
 
-#main
+# all environments
+app.set "port", settings.port
+app.set "views", path.join(__dirname, "views")
+app.set "view engine", "hjs"
+app.use express.favicon()
+app.use express.logger("dev")
+app.use express.json()
+app.use express.urlencoded()
+app.use express.methodOverride()
+app.use app.router
+app.use express.static(path.join(__dirname, "public"))
+
+# development only
+app.use express.errorHandler()  if "development" is app.get("env")
+
+#TODO: 拆分文件
 MongoClient.connect settings.database, (err, db)->
   throw err if err
 
   apps_collection = db.collection('apps')
   logs_collection = db.collection('logs')
+  pages_collection = db.collection('pages')
 
+  #监控记录
   log = (app, alive, message)->
     console.log "#{app.name} #{alive} #{message}"
+
+    #存活，清空重试次数
+    if alive and app.alive and app.retries
+      apps_collection.update {_id:app._id}, {$set:{retries:0}}, (err)->
+        throw err if err
+
+    #存活状态变更
     if alive != app.alive
       date = new Date()
       logs_collection.insert {app: app._id, alive: alive, message: message, created_at: date}, (err)->
         throw err if err
 
-      if alive
+      if alive #上线
         console.log "#{app.name} up #{message}"
         #邮件通知
         smtp.sendMail
           from: "萌卡监控 <zh99998@gmail.com>"
           to: "zh99998@gmail.com",
-          subject: "萌卡监控 - #{app.name} 恢复可用 (#{message})"
+          subject: "#{app.name} 恢复可用 (#{message})"
           text: "#{message}"
           html: "#{message}"
 
         #xmpp通知
         stanza = new xmpp.Element('message',{ to: 'zh99998@gmail.com', type: 'chat' }).c('body').t(
-          "萌卡监控 - #{app.name} 恢复可用 (#{message})"
+          "#{app.name} 恢复可用 (#{message})"
         )
         xmpp_client.send(stanza)
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive, retries:0}}, (err)->
           throw err if err
 
-      else if app.retries >= 5
+      else if app.retries >= 5 #下线
         console.log "#{app.name} down #{message}"
 
         #邮件通知
         smtp.sendMail
           from: "萌卡监控 <zh99998@gmail.com>"
           to: "zh99998@gmail.com",
-          subject: "萌卡监控 - #{app.name} 不可用 (#{message})"
+          subject: "#{app.name} 不可用 (#{message})"
           text: "#{message}"
           html: "#{message}"
 
         #xmpp通知
         stanza = new xmpp.Element('message',{ to: 'zh99998@gmail.com', type: 'chat' }).c('body').t(
-          "萌卡监控 - #{app.name} 不可用 (#{message})"
+          "#{app.name} 不可用 (#{message})"
         )
         xmpp_client.send(stanza)
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive}}, (err)->
           throw err if err
 
-      else
+      else #重试
         console.log "#{app.name} retry#{app.retries} #{message}"
         apps_collection.update {_id:app._id}, {$inc:{retries:1}}, (err)->
           throw err if err
 
+
+  #监控逻辑
   setInterval ->
     apps_collection.find().each (err, app)->
       throw err if err
@@ -107,7 +135,7 @@ MongoClient.connect settings.database, (err, db)->
               log(app, false, error)
 
             client.on "connect", (connection) ->
-              this.close()
+              connection.close()
               log(app, true, "WebSocket连接成功")
 
             client.connect app.url
@@ -166,7 +194,19 @@ MongoClient.connect settings.database, (err, db)->
 
   , settings.interval
 
-  http.createServer (req, res)->
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('nya');
-  .listen(settings.port);
+  #网站逻辑
+
+  app.get "/", (req, res)->
+    pages_collection.findOne domain: req.headers.host, (err, page)->
+      throw err if err
+      if page
+        apps = apps_collection.find _id: {$in: page.apps}, (err, apps)->
+          throw err if err
+          logs = logs_collection.find app: {$in: page.apps}, (err, apps)->
+            throw err if err
+              res.render 'page', { page: page, apps: apps, logs: logs, title: 'req' }
+      else
+        res.render 'index', { title: 'mycard-monitor' }
+
+  http.createServer(app).listen app.get("port"), ->
+    console.log "Express server listening on port " + app.get("port")
