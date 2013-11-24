@@ -138,8 +138,6 @@
         }
       }
     };
-    console.log(apps_collection, apps_collection.find(), 1);
-    console.log(apps_collection, apps_collection.find()(), 2);
     setInterval(function() {
       return apps_collection.find().toArray(function(err, apps) {
         return apps.forEach(function(app) {
