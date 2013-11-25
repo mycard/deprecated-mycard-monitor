@@ -69,6 +69,25 @@ MongoClient.connect settings.database, (err, db)->
   logs_collection = db.collection('logs')
   pages_collection = db.collection('pages')
 
+  notice = (app, alive, message)->
+    if app.contacts
+      for contact in app.contacts
+        url_parsed = url.parse contact
+        console.log url_parsed
+        switch url_parsed.protocol
+          when 'mailto:'
+            smtp.sendMail
+              from: "萌卡监控 <zh99998@gmail.com>"
+              to: contact.split(':',2)[1],
+              subject: "#{app.name} #{if alive then '' else '不'}可用 (#{message})"
+              text: "#{message}"
+              html: "#{message}"
+          when 'xmpp:'
+            stanza = new xmpp.Element('message',{ to: contact.split(':',2)[1], type: 'chat' }).c('body').t(
+              "#{app.name} #{if alive then '' else '不'}可用 (#{message})"
+            )
+            xmpp_client.send(stanza)
+
   #监控记录
   record = (app, alive, message)->
     message = message.toString()
@@ -85,19 +104,8 @@ MongoClient.connect settings.database, (err, db)->
 
       if alive #上线
         console.log "#{app.name} up #{message}"
-        #邮件通知
-        smtp.sendMail
-          from: "萌卡监控 <zh99998@gmail.com>"
-          to: "zh99998@gmail.com",
-          subject: "#{app.name} 恢复可用 (#{message})"
-          text: "#{message}"
-          html: "#{message}"
 
-        #xmpp通知
-        stanza = new xmpp.Element('message',{ to: 'zh99998@gmail.com', type: 'chat' }).c('body').t(
-          "#{app.name} 恢复可用 (#{message})"
-        )
-        xmpp_client.send(stanza)
+        notice(app, alive, message)
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive, retries:0}}, (err)->
           throw err if err
@@ -107,19 +115,7 @@ MongoClient.connect settings.database, (err, db)->
       else if app.retries >= 5 #下线
         console.log "#{app.name} down #{message}"
 
-        #邮件通知
-        smtp.sendMail
-          from: "萌卡监控 <zh99998@gmail.com>"
-          to: "zh99998@gmail.com",
-          subject: "#{app.name} 不可用 (#{message})"
-          text: "#{message}"
-          html: "#{message}"
-
-        #xmpp通知
-        stanza = new xmpp.Element('message',{ to: 'zh99998@gmail.com', type: 'chat' }).c('body').t(
-          "#{app.name} 不可用 (#{message})"
-        )
-        xmpp_client.send(stanza)
+        notice(app, alive, message)
 
         apps_collection.update {_id:app._id}, {$set:{alive:alive}}, (err)->
           throw err if err

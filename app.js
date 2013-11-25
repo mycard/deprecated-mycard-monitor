@@ -91,15 +91,48 @@
   }
 
   MongoClient.connect(settings.database, function(err, db) {
-    var apps_collection, logs_collection, pages_collection, record;
+    var apps_collection, logs_collection, notice, pages_collection, record;
     if (err) {
       throw err;
     }
     apps_collection = db.collection('apps');
     logs_collection = db.collection('logs');
     pages_collection = db.collection('pages');
+    notice = function(app, alive, message) {
+      var contact, stanza, url_parsed, _i, _len, _ref, _results;
+      if (app.contacts) {
+        _ref = app.contacts;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          contact = _ref[_i];
+          url_parsed = url.parse(contact);
+          console.log(url_parsed);
+          switch (url_parsed.protocol) {
+            case 'mailto:':
+              _results.push(smtp.sendMail({
+                from: "萌卡监控 <zh99998@gmail.com>",
+                to: contact.split(':', 2)[1],
+                subject: "" + app.name + " " + (alive ? '' : '不') + "可用 (" + message + ")",
+                text: "" + message,
+                html: "" + message
+              }));
+              break;
+            case 'xmpp:':
+              stanza = new xmpp.Element('message', {
+                to: contact.split(':', 2)[1],
+                type: 'chat'
+              }).c('body').t("" + app.name + " " + (alive ? '' : '不') + "可用 (" + message + ")");
+              _results.push(xmpp_client.send(stanza));
+              break;
+            default:
+              _results.push(void 0);
+          }
+        }
+        return _results;
+      }
+    };
     record = function(app, alive, message) {
-      var date, stanza;
+      var date;
       message = message.toString();
       console.log("" + app.name + " " + alive + " " + message);
       if (alive && app.alive && app.retries) {
@@ -119,18 +152,7 @@
         date = new Date();
         if (alive) {
           console.log("" + app.name + " up " + message);
-          smtp.sendMail({
-            from: "萌卡监控 <zh99998@gmail.com>",
-            to: "zh99998@gmail.com",
-            subject: "" + app.name + " 恢复可用 (" + message + ")",
-            text: "" + message,
-            html: "" + message
-          });
-          stanza = new xmpp.Element('message', {
-            to: 'zh99998@gmail.com',
-            type: 'chat'
-          }).c('body').t("" + app.name + " 恢复可用 (" + message + ")");
-          xmpp_client.send(stanza);
+          notice(app, alive, message);
           apps_collection.update({
             _id: app._id
           }, {
@@ -155,18 +177,7 @@
           });
         } else if (app.retries >= 5) {
           console.log("" + app.name + " down " + message);
-          smtp.sendMail({
-            from: "萌卡监控 <zh99998@gmail.com>",
-            to: "zh99998@gmail.com",
-            subject: "" + app.name + " 不可用 (" + message + ")",
-            text: "" + message,
-            html: "" + message
-          });
-          stanza = new xmpp.Element('message', {
-            to: 'zh99998@gmail.com',
-            type: 'chat'
-          }).c('body').t("" + app.name + " 不可用 (" + message + ")");
-          xmpp_client.send(stanza);
+          notice(app, alive, message);
           apps_collection.update({
             _id: app._id
           }, {
