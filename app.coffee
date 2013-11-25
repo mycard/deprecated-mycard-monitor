@@ -222,13 +222,19 @@ MongoClient.connect settings.database, (err, db)->
               if !app.alive
                 alive = false
                 break
+
+            if alive #uptime
+              uptime_humane = moment(logs[0]).fromNow(true); #TODO: 本地化时间显示
+            else #downtime
+              #logs.(app._id for app in apps when !app.alive)
+
             for log in logs
               log.created_at_humane = log.created_at.toString() #TODO: 本地化时间显示
               for app in apps
                 if app._id.equals log.app
                   log.app = app
                   break
-            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, locale: res.getLocale(), __:->res.__}
+            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, uptime_humane: uptime_humane, locale: res.getLocale(), __:->res.__}
       else
         res.render 'index', { locale: res.getLocale(), __:->res.__ }
   app.get "/favicon.ico", (req, res)->

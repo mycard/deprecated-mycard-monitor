@@ -338,7 +338,7 @@
             }).sort({
               created_at: -1
             }).limit(10).toArray(function(err, logs) {
-              var alive, log, _i, _j, _k, _len, _len1, _len2;
+              var alive, log, uptime_humane, _i, _j, _k, _len, _len1, _len2;
               if (err) {
                 throw err;
               }
@@ -349,6 +349,11 @@
                   alive = false;
                   break;
                 }
+              }
+              if (alive) {
+                uptime_humane = moment(logs[0]).fromNow(true);
+              } else {
+
               }
               for (_j = 0, _len1 = logs.length; _j < _len1; _j++) {
                 log = logs[_j];
@@ -366,6 +371,7 @@
                 apps: apps,
                 logs: logs,
                 alive: alive,
+                uptime_humane: uptime_humane,
                 locale: res.getLocale(),
                 __: function() {
                   return res.__;

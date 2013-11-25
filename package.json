@@ -3,7 +3,8 @@
   "subdomain": "mycard-monitor",
   "domains": [
     "status.my-card.in",
-    "status.oekaki.so"
+    "status.oekaki.so",
+    "moedns.status.my-card.in"
   ],
   "version": "0.1.2",
   "author": "zh99998 <zh99998@gmail.com>",
