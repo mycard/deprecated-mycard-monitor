@@ -56,7 +56,7 @@ app.use express.urlencoded()
 app.use express.methodOverride()
 app.use i18n.init
 app.use app.router
-app.use express.static(path.join(__dirname, "public"))
+app.use express.static(path.join(__dirname, "public"), {maxAge:31557600000})
 
 # development only
 app.use express.errorHandler()  if "development" is app.get("env")
@@ -210,6 +210,7 @@ MongoClient.connect settings.database, (err, db)->
     pages_collection.findOne domain: req.headers.host, (err, page)->
       throw err if err
       if page
+        res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
         apps = apps_collection.find(_id: {$in: page.apps}).toArray (err, apps)->
           throw err if err
           logs = logs_collection.find(app: {$in: page.apps}).sort({created_at: -1}).limit(10).toArray (err, logs)->
@@ -227,7 +228,7 @@ MongoClient.connect settings.database, (err, db)->
                   break
             res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, locale: res.getLocale(), __:->res.__}
       else
-        res.render 'index', { title: 'mycard-monitor', locale: res.getLocale(), __:->res.__ }
+        res.render 'index', { locale: res.getLocale(), __:->res.__ }
   app.get "/favicon.ico", (req, res)->
     pages_collection.findOne domain: req.headers.host, (err, page)->
       throw err if err

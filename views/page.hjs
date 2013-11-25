@@ -44,7 +44,7 @@
     </div>
     <div id="apps" class="btn-group btn-group-lg btn-group-justified">
         {{#apps}}
-            <a type="button" class="btn {{#alive}}btn-success{{/alive}}{{^alive}}btn-danger{{/alive}}">{{name}}</a>
+            <a type="button" class="btn {{#alive}}{{#retries}}btn-warning{{/retries}}{{^retries}}btn-success{{/retries}}{{/alive}}{{^alive}}btn-danger{{/alive}}">{{name}}</a>
         {{/apps}}
     </div>
 

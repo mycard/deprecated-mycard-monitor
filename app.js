@@ -82,7 +82,9 @@
 
   app.use(app.router);
 
-  app.use(express["static"](path.join(__dirname, "public")));
+  app.use(express["static"](path.join(__dirname, "public"), {
+    maxAge: 31557600000
+  }));
 
   if ("development" === app.get("env")) {
     app.use(express.errorHandler());
@@ -303,6 +305,7 @@
           throw err;
         }
         if (page) {
+          res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
           return apps = apps_collection.find({
             _id: {
               $in: page.apps
@@ -356,7 +359,6 @@
           });
         } else {
           return res.render('index', {
-            title: 'mycard-monitor',
             locale: res.getLocale(),
             __: function() {
               return res.__;
