@@ -36,10 +36,10 @@
 
     <div class="jumbotron">
         {{#alive}}
-            <h1><span class="glyphicon glyphicon-ok"></span>{{#__}}all_up{{/__}}</h1>
+            <h1><span class="glyphicon glyphicon-ok"></span> {{#__}}all_up{{/__}}</h1>
         {{/alive}}
         {{^alive}}
-            <h1><span class="glyphicon glyphicon-remove"></span>{{#__}}any_down{{/__}}</h1>
+            <h1><span class="glyphicon glyphicon-remove"></span> {{#__}}any_down{{/__}}</h1>
         {{/alive}}
         <p>{{#alive}}{{#__}}uptime{{/__}}: {{uptime_humane}}{{/alive}}</p>
     </div>
