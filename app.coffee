@@ -7,7 +7,7 @@ http = require 'http'
 #三方库
 express = require "express"
 i18n = require "i18n"
-moment = require 'moment'
+moment = require 'moment-timezone'
 request = require 'request'
 nodemailer = require "nodemailer"
 xmpp = require 'node-xmpp'
@@ -224,7 +224,7 @@ MongoClient.connect settings.database, (err, db)->
                 break
 
             if alive #uptime
-              uptime_humane = moment(logs[0]).fromNow(true); #TODO: 本地化时间显示
+              uptime_humane = moment(logs[0]).tz("Asia/Shanghai").lang('zh-cn').fromNow(true); #TODO: 本地化时间显示
             else #downtime
               #logs.(app._id for app in apps when !app.alive)
 
