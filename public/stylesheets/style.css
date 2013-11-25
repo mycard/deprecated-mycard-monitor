@@ -93,3 +93,7 @@ body {
 #apps > .btn:last-child {
     border-top-right-radius: 0;
 }
+
+.brand a:link, .footer a:link, .brand a:visited, .footer a:visited {
+    color:inherit;
+}

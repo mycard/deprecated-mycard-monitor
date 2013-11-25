@@ -1,37 +1,38 @@
 {
-    "name": "mycard-monitor",
-    "subdomain": "mycard-monitor",
-    "domains": [
-        "status.my-card.in",
-        "status.oekaki.so"
-    ],
-    "version": "0.1.2",
-    "author": "zh99998 <zh99998@gmail.com>",
-    "description": "high customization web service monitor",
-    "main": "mycard-monitor.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mycard/mycard-monitor.git"
-    },
-    "keywords": [
-        "monitor"
-    ],
-    "scripts": {
-        "start": "node app.js"
-    },
-    "dependencies": {
-        "mongodb": "~1.3.20",
-        "nodemailer": "~0.5.8",
-        "node-stringprep": "~0.1.8",
-        "node-xmpp": "~0.10.7",
-        "request": "~2.27.0",
-        "websocket": "~1.0.8",
-        "native-dns": "~0.4.1",
-        "express": "3.4.4",
-        "hjs": "*"
-    },
-    "license": "GPLv3",
-    "engines": {
-        "node": "*"
-    }
+  "name": "mycard-monitor",
+  "subdomain": "mycard-monitor",
+  "domains": [
+    "status.my-card.in",
+    "status.oekaki.so"
+  ],
+  "version": "0.1.2",
+  "author": "zh99998 <zh99998@gmail.com>",
+  "description": "high customization web service monitor",
+  "main": "mycard-monitor.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mycard/mycard-monitor.git"
+  },
+  "keywords": [
+    "monitor"
+  ],
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "mongodb": "~1.3.20",
+    "nodemailer": "~0.5.8",
+    "node-stringprep": "~0.1.8",
+    "node-xmpp": "~0.10.7",
+    "request": "~2.27.0",
+    "websocket": "~1.0.8",
+    "native-dns": "~0.4.1",
+    "express": "3.4.4",
+    "hjs": "*",
+    "i18n": "~0.4.1"
+  },
+  "license": "GPLv3",
+  "engines": {
+    "node": "*"
+  }
 }

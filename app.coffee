@@ -6,6 +6,7 @@ http = require 'http'
 
 #三方库
 express = require "express"
+i18n = require "i18n"
 request = require 'request'
 nodemailer = require "nodemailer"
 xmpp = require 'node-xmpp'
@@ -39,6 +40,10 @@ smtp = nodemailer.createTransport "SMTP",settings.mail
 xmpp_client = new xmpp.Client(settings.xmpp)
 app = express()
 
+i18n.configure
+  locales:['en', 'zh'],
+  directory: __dirname + '/locales'
+
 # all environments
 app.set "port", settings.port
 app.set "views", path.join(__dirname, "views")
@@ -48,6 +53,7 @@ app.use express.logger("dev")
 app.use express.json()
 app.use express.urlencoded()
 app.use express.methodOverride()
+app.use i18n.init
 app.use app.router
 app.use express.static(path.join(__dirname, "public"))
 
@@ -218,9 +224,16 @@ MongoClient.connect settings.database, (err, db)->
                 if app._id.equals log.app
                   log.app = app
                   break
-            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive}
+            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, __:->res.__}
       else
         res.render 'index', { title: 'mycard-monitor' }
+  app.get "/favicon.ico", (req, res)->
+    pages_collection.findOne domain: req.headers.host, (err, page)->
+      throw err if err
+      if page and page.favicon
+        res.redirect(301, page.favicon);
+      else
+        res.redirect(301, "https://my-card.in/favicon.ico");
 
   http.createServer(app).listen app.get("port"), ->
     console.log "Express server listening on port " + app.get("port")

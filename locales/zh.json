@@ -1,0 +1,9 @@
+{
+    "mycard-monitor": "萌卡监控",
+    "home":"首页",
+    "status": "状态",
+    "all_up": "服务正常",
+    "any_down": "服务异常",
+    "app_up": "可用",
+    "app_down": "不可用"
+}
