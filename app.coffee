@@ -221,7 +221,7 @@ MongoClient.connect settings.database, (err, db)->
                 alive = false
                 break
             for log in logs
-              log.created_at_humane = log.created_at.toLocaleString()
+              log.created_at_humane = log.created_at.toString() #TODO: 本地化时间显示
               for app in apps
                 if app._id.equals log.app
                   log.app = app
