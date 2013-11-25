@@ -4,7 +4,8 @@
   "domains": [
     "status.my-card.in",
     "status.oekaki.so",
-    "moedns.status.my-card.in"
+    "moedns.status.my-card.in",
+    "status.code5light.com"
   ],
   "version": "0.1.2",
   "author": "zh99998 <zh99998@gmail.com>",
