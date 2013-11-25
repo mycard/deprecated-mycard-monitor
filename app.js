@@ -14,7 +14,7 @@
 
   i18n = require("i18n");
 
-  moment = require('moment');
+  moment = require('moment-timezone');
 
   request = require('request');
 

@@ -7,7 +7,7 @@ http = require 'http'
 #三方库
 express = require "express"
 i18n = require "i18n"
-moment = require 'moment'
+moment = require 'moment-timezone'
 request = require 'request'
 nodemailer = require "nodemailer"
 xmpp = require 'node-xmpp'
