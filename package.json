@@ -7,7 +7,7 @@
     "moedns.status.my-card.in",
     "status.code5light.com"
   ],
-  "version": "0.1.2",
+  "version": "0.2.1",
   "author": "zh99998 <zh99998@gmail.com>",
   "description": "high customization web service monitor",
   "main": "mycard-monitor.js",
