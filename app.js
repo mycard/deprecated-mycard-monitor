@@ -353,7 +353,7 @@
               if (alive) {
                 uptime_humane = moment(logs[0]).tz("Asia/Shanghai").lang('zh-cn').fromNow(true);
               } else {
-
+                console.log('test');
               }
               for (_j = 0, _len1 = logs.length; _j < _len1; _j++) {
                 log = logs[_j];
