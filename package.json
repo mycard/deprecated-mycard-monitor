@@ -32,7 +32,7 @@
     "express": "3.4.4",
     "hjs": "*",
     "i18n": "~0.4.1",
-    "moment-timezone": "0.0.3"
+    "moment": "~2.4.0"
   },
   "license": "GPLv3",
   "engines": {

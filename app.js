@@ -14,7 +14,7 @@
 
   i18n = require("i18n");
 
-  moment = require('moment-timezone');
+  moment = require('moment');
 
   request = require('request');
 
@@ -351,7 +351,7 @@
                 }
               }
               if (alive) {
-                uptime_humane = moment(logs[0]).tz("Asia/Shanghai").lang('zh-cn').fromNow(true);
+                uptime_humane = moment(logs[0]).fromNow(true);
               } else {
 
               }
