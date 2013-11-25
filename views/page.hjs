@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{locale}}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,18 +28,18 @@
 <div class="container">
     <div class="header">
         <ul class="nav nav-pills pull-right">
-            {{#page.url}}<li><a href="{{page.url}}">首页</a></li>{{/page.url}}
-            <li class="active"><a href="#">状态</a></li>
+            {{#page.url}}<li><a href="{{page.url}}">{{#__}}home{{/__}}</a></li>{{/page.url}}
+            <li class="active"><a href="#">{{#__}}status{{/__}}</a></li>
         </ul>
         <h3 class="brand text-muted">{{#page.url}}<a href="{{page.url}}">{{page.name}}</a>{{/page.url}}{{^page.url}}{{page.name}}{{/page.url}} {{#__}}status{{/__}}</h3>
     </div>
 
     <div class="jumbotron">
         {{#alive}}
-            <h1><span class="glyphicon glyphicon-ok"></span>{{page.name}} 服务正常</h1>
+            <h1><span class="glyphicon glyphicon-ok"></span> {{page.name}} {{#__}}all_up{{/__}}</h1>
         {{/alive}}
         {{^alive}}
-            <h1><span class="glyphicon glyphicon-remove"></span>{{page.name}} 服务异常</h1>
+            <h1><span class="glyphicon glyphicon-remove"></span> {{page.name}} {{#__}}any_down{{/__}}</h1>
         {{/alive}}
     </div>
     <div id="apps" class="btn-group btn-group-lg btn-group-justified">
@@ -51,16 +51,16 @@
     <div>
         {{#logs}}
             {{#alive}}
-                <div class="alert alert-success"><a href="#" class="alert-link">{{app.name}}</a> 恢复可用 ({{message}}) {{created_at_humane}}</div>
+                <div class="alert alert-success"><a href="#" class="alert-link">{{app.name}}</a> {{#__}}app_up{{/__}} ({{message}}) {{created_at_humane}}</div>
             {{/alive}}
             {{^alive}}
-                <div class="alert alert-danger"><a href="#" class="alert-link">{{app.name}}</a> 不可用 ({{message}}) {{created_at_humane}}</div>
+                <div class="alert alert-danger"><a href="#" class="alert-link">{{app.name}}</a> {{#__}}app_down{{/__}} ({{message}}) {{created_at_humane}}</div>
             {{/alive}}
         {{/logs}}
     </div>
 
     <div class="footer">
-        <p>&copy; <a href="http://mycard-monitor.jitsu.com">萌卡监控</a> 2013</p>
+        <p>&copy; <a href="http://mycard-monitor.jitsu.com">{{#__}}mycard-monitor{{/__}}</a> 2013</p>
     </div>
 
 </div> <!-- /container -->

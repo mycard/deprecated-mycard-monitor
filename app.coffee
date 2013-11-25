@@ -7,6 +7,7 @@ http = require 'http'
 #三方库
 express = require "express"
 i18n = require "i18n"
+moment = require 'moment'
 request = require 'request'
 nodemailer = require "nodemailer"
 xmpp = require 'node-xmpp'
@@ -224,9 +225,9 @@ MongoClient.connect settings.database, (err, db)->
                 if app._id.equals log.app
                   log.app = app
                   break
-            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, __:->res.__}
+            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, locale: res.getLocale(), __:->res.__}
       else
-        res.render 'index', { title: 'mycard-monitor' }
+        res.render 'index', { title: 'mycard-monitor', locale: res.getLocale(), __:->res.__ }
   app.get "/favicon.ico", (req, res)->
     pages_collection.findOne domain: req.headers.host, (err, page)->
       throw err if err

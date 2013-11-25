@@ -2,8 +2,8 @@
     "mycard-monitor": "MyCard Monitor",
     "home":"Home",
     "status": "Status",
-    "all_up": "all systems up",
-    "any_down": "down",
+    "all_up": "Online",
+    "any_down": "Down",
     "app_up": "up",
     "app_down": "down"
 }
