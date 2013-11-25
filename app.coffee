@@ -170,11 +170,13 @@ MongoClient.connect settings.database, (err, db)->
             client.on 'error', (error)->
               record(app, false, error)
           when 'dns:'
-            question = dns.Question
+            question =
               name: url_parsed.pathname.slice(1)
             for dnsquery in url_parsed.query.split('&')
               [key, value] = dnsquery.split('=', 2)
               question[key] = value
+
+            question = dns.Question question
 
             dns.lookup url_parsed.host, 4, (err, address, family)->
               if err
@@ -185,12 +187,16 @@ MongoClient.connect settings.database, (err, db)->
                   server: { address: address, port: url_parsed.port ? 53, type: 'udp' },
                   timeout: 10000,
                 });
+
                 req.on 'timeout', ()->
                   record(app, false, "DNS 请求超时")
 
                 req.on 'message', (err, answer)->
-                  if answer.answer.length
-                    record(app, true, answer.answer[0].data)
+                  if err
+                    record(app, false, err)
+                  else if answer.answer.length
+                    ans = answer.answer[0]
+                    record(app, true, ans.address ? ans.data ? JSON.stringify(ans))
                   else
                     record(app, false, "DNS 查询结果为空")
 

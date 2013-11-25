@@ -265,15 +265,16 @@
                 return record(app, false, error);
               });
             case 'dns:':
-              question = dns.Question({
+              question = {
                 name: url_parsed.pathname.slice(1)
-              });
+              };
               _ref = url_parsed.query.split('&');
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 dnsquery = _ref[_i];
                 _ref1 = dnsquery.split('=', 2), key = _ref1[0], value = _ref1[1];
                 question[key] = value;
               }
+              question = dns.Question(question);
               return dns.lookup(url_parsed.host, 4, function(err, address, family) {
                 var req, _ref2;
                 if (err) {
@@ -292,8 +293,12 @@
                     return record(app, false, "DNS 请求超时");
                   });
                   req.on('message', function(err, answer) {
-                    if (answer.answer.length) {
-                      return record(app, true, answer.answer[0].data);
+                    var ans, _ref3, _ref4;
+                    if (err) {
+                      return record(app, false, err);
+                    } else if (answer.answer.length) {
+                      ans = answer.answer[0];
+                      return record(app, true, (_ref3 = (_ref4 = ans.address) != null ? _ref4 : ans.data) != null ? _ref3 : JSON.stringify(ans));
                     } else {
                       return record(app, false, "DNS 查询结果为空");
                     }
