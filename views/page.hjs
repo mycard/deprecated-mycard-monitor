@@ -95,13 +95,13 @@
         client_test({{{client_test_json}}}, function(app, alive, message){
             if(alive == null){
                 $("#client_test_"+app._id).removeClass('btn-default btn-info btn-success btn-danger').addClass('btn-info')
-                $('<div class="alert alert-info"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_client_unsupported{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').prependTo('#logs').hide().slideDown()
+                $('<div class="alert alert-info"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_client_unsupported{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().slideDown(400).prependTo('#logs')
             }else if(alive){
                 $("#client_test_"+app._id).removeClass('btn-default btn-info btn-success btn-danger').addClass('btn-success')
-                $('<div class="alert alert-success"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_up{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().prependTo('#logs').slideDown('fast')
+                $('<div class="alert alert-success"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_up{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().slideDown(400).prependTo('#logs')
             }else{
                 $("#client_test_"+app._id).removeClass('btn-default btn-info btn-success btn-danger').addClass('btn-danger')
-                $('<div class="alert alert-danger"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_down{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().slideDown().prependTo('#logs')
+                $('<div class="alert alert-danger"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_down{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().slideDown(400).prependTo('#logs')
             }
         })
     </script>
