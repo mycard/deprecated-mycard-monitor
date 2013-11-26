@@ -86,7 +86,7 @@ body {
 
 #apps_status > .btn-group-justified:last-child {
     margin-bottom: 30px;
-}
+} 
 
 #apps_status > .btn-group-justified:last-child > .btn {
     border-top-left-radius: 0;
