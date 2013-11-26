@@ -167,10 +167,6 @@ MongoClient.connect settings.database, (err, db)->
                 connection.close()
                 record(app, true, "WebSocket连接成功")
 
-
-
-
-
             client.connect app.url
           when 'http:', 'https:'
             request

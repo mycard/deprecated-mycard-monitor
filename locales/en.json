@@ -6,7 +6,10 @@
     "any_down": "Down",
     "app_up": "up",
     "app_down": "down",
+    "app_testing": "Testing...",
+    "app_client_unsupported": "Client Not Supported",
     "welcome": "MyCard Monitor is under developing now. Contact <a href=\"mailto:zh99998@gmail.com\">zh99998@gmail.com</a> to get an account, or go to <a href=\"https://github.com/mycard/mycard-monitor\">https://github.com/mycard/mycard-monitor</a> to get your own one.",
     "uptime": "uptime",
-    "downtime": "downtime"
+    "downtime": "downtime",
+    "client_test": "Client Test"
 }
