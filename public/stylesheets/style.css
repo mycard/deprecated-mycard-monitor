@@ -86,7 +86,7 @@ body {
 
 #apps_status > .btn-group-justified:last-child {
     margin-bottom: 30px;
-} 
+}
 
 #apps_status > .btn-group-justified:last-child > .btn {
     border-top-left-radius: 0;
@@ -95,6 +95,11 @@ body {
 
 #apps_status > .btn-group-justified:not(:last-child) > .btn {
     border-radius: 0;
+}
+
+#apps_status .btn {
+    -webkit-transition-property:color, background, border;
+    -webkit-transition-duration: 0.4s, 0.4s, 0.4s;
 }
 
 .brand a:link, .footer a:link, .brand a:visited, .footer a:visited {
