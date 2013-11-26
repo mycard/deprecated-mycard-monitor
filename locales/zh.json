@@ -7,7 +7,7 @@
     "app_up": "可用",
     "app_down": "不可用",
     "app_testing": "正在测试...",
-    "app_client_unsupported": "客户端不支持这项测试",
+    "app_client_unsupported": "浏览器不支持这项测试",
     "welcome": "萌卡监控内测中，联系 <a href=\"mailto:zh99998@gmail.com\">zh99998@gmail.com</a> 来获取一个账号，或者到 <a href=\"https://github.com/mycard/mycard-monitor\">https://github.com/mycard/mycard-monitor</a> 下载源码自行部署。",
     "uptime": "正常运行时间",
     "downtime": "故障时间",
