@@ -231,8 +231,39 @@
                 return record(app, false, error);
               });
               client.on("connect", function(connection) {
-                connection.close();
-                return record(app, true, "WebSocket连接成功");
+                var returned;
+                if (app.data) {
+                  returned = false;
+                  connection.on('message', function(message) {
+                    if (!returned) {
+                      returned = true;
+                      record(app, true, message.type);
+                      return connection.close();
+                    }
+                  });
+                  connection.on('error', function(error) {
+                    if (!returned) {
+                      returned = true;
+                      return record(app, false, error);
+                    }
+                  });
+                  connection.on('close', function() {
+                    if (!returned) {
+                      returned = true;
+                      return record(app, false, "WebSocket没有返回内容");
+                    }
+                  });
+                  return setTimeout(function() {
+                    if (!returned) {
+                      returned = true;
+                      record(app, false, "WebSocket等待返回内容超时");
+                      return connection.close();
+                    }
+                  }, 10000);
+                } else {
+                  connection.close();
+                  return record(app, true, "WebSocket连接成功");
+                }
               });
               return client.connect(app.url);
             case 'http:':

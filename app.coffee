@@ -141,8 +141,35 @@ MongoClient.connect settings.database, (err, db)->
               record(app, false, error)
 
             client.on "connect", (connection) ->
-              connection.close()
-              record(app, true, "WebSocket连接成功")
+              if app.data
+                returned = false
+                connection.on 'message', (message)->
+                  if !returned
+                    returned = true
+                    record(app, true, message.type)
+                    connection.close()
+                connection.on 'error', (error)->
+                  if !returned
+                    returned = true
+                    record(app, false, error)
+                connection.on 'close', ()->
+                  if !returned
+                    returned = true
+                    record(app, false, "WebSocket没有返回内容")
+                setTimeout ->
+                  if !returned
+                    returned = true
+                    record(app, false, "WebSocket等待返回内容超时")
+                    connection.close()
+                , 10000
+
+              else
+                connection.close()
+                record(app, true, "WebSocket连接成功")
+
+
+
+
 
             client.connect app.url
           when 'http:', 'https:'
