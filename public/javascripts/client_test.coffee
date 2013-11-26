@@ -32,13 +32,13 @@
 
           client.onclose = (evt)->
             console.log app.url, 'close', evt
-            if app.connection or !alive?
+            if app.connection and alive or !alive?
               alive = false
               callback(app, alive, evt.type)
 
           client.onerror = (evt)->
             console.log app.url, 'error', evt
-            if app.connection or !alive?
+            if app.connection and alive or !alive?
               alive = false
               callback(app, alive, evt.type)
 

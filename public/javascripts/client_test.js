@@ -42,14 +42,14 @@
             };
             client.onclose = function(evt) {
               console.log(app.url, 'close', evt);
-              if (app.connection || (alive == null)) {
+              if (app.connection && alive || (alive == null)) {
                 alive = false;
                 return callback(app, alive, evt.type);
               }
             };
             client.onerror = function(evt) {
               console.log(app.url, 'error', evt);
-              if (app.connection || (alive == null)) {
+              if (app.connection && alive || (alive == null)) {
                 alive = false;
                 return callback(app, alive, evt.type);
               }
