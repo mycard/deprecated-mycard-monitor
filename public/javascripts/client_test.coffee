@@ -4,18 +4,18 @@
     switch url.attr 'protocol'
       when 'http', 'https'
         $.get app.url, (data, textStatus, jqXHR)->
-          console.log(app.url, data, textStatus, jqXHR)
           callback(app, true, textStatus)
-        .fail (error)->
-          console.log(app.url, error)
-          callback(app, false, error.statusText)
+        .fail (error, a, b)->
+            if(error.statusText == 'No Transport')
+              callback(app, null, error.statusText)
+            else
+              callback(app, false, error.statusText)
       when 'ws', 'wss'
         if(window.WebSocket)
           client = new WebSocket(app.url)
 
           returned = false
           client.onclose = (evt)->
-            console.log(app.url, 'onclose', evt)
             if !returned
               returned = true
               callback(app, false, evt.type)
