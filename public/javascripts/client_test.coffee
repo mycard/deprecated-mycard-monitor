@@ -8,7 +8,7 @@
         .fail (error)->
           callback(app, false, error.statusText)
       when 'ws', 'wss'
-        if(WebSocket)
+        if(window.WebSocket)
           client = new WebSocket(app.url)
 
           returned = false
