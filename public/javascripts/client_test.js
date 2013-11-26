@@ -8,8 +8,10 @@
         case 'http':
         case 'https':
           return $.get(app.url, function(data, textStatus, jqXHR) {
+            console.log(app.url, data, textStatus, jqXHR);
             return callback(app, true, textStatus);
           }).fail(function(error) {
+            console.log(app.url, error);
             return callback(app, false, error.statusText);
           });
         case 'ws':
@@ -18,6 +20,7 @@
             client = new WebSocket(app.url);
             returned = false;
             client.onclose = function(evt) {
+              console.log(app.url, 'onclose', evt);
               if (!returned) {
                 returned = true;
                 return callback(app, false, evt.type);

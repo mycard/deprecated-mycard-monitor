@@ -84,6 +84,11 @@
 <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="javascripts/bootstrap.min.js"></script>
 {{#client_test_json}}
+    <!-- Cross-Domain AJAX for IE8 and IE9 -->
+    <!--[if lt IE 10]>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.1/jquery.xdomainrequest.min.js"></script>
+    <![endif]-->
+
     <script src="javascripts/purl.js"></script>
     <script src="javascripts/client_test.js"></script>
     <script>
