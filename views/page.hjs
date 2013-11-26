@@ -57,8 +57,8 @@
                 <a id="client_test_{{_id}}" type="button" class="btn btn-default">{{name}}</a>
             {{/client_test}}
         </div>
+        {{/client_test_json}}
     </div>
-    {{/client_test_json}}
 
     <div id="logs">
         {{#logs}}
