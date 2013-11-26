@@ -382,7 +382,7 @@
                 }
               }
               if (alive) {
-                uptime_humane = moment(logs[0].created_at).tz("Asia/Shanghai").lang('zh-cn').fromNow(true);
+                uptime_humane = moment(logs[0].created_at).lang('zh-cn').fromNow(true);
               } else {
 
               }

@@ -247,7 +247,7 @@ MongoClient.connect settings.database, (err, db)->
                 break
 
             if alive #uptime
-              uptime_humane = moment(logs[0].created_at).tz("Asia/Shanghai").lang('zh-cn').fromNow(true); #TODO: 本地化时间显示
+              uptime_humane = moment(logs[0].created_at).lang('zh-cn').fromNow(true); #TODO: 本地化时间显示
             else #downtime
               #logs.(app._id for app in apps when !app.alive)
 

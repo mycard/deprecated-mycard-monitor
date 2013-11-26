@@ -2,7 +2,7 @@
 (function() {
   this.client_test = function(apps, callback) {
     return $.each(apps, function(index, app) {
-      var client, returned, url;
+      var alive, client, url;
       url = $.url(app.url);
       switch (url.attr('protocol')) {
         case 'http':
@@ -20,38 +20,41 @@
         case 'wss':
           if (window.WebSocket) {
             client = new WebSocket(app.url);
-            returned = false;
+            alive = null;
+            client.onopen = function(evt) {
+              if (!app.data) {
+                alive = true;
+                callback(app, alive, evt.type);
+                if (!app.connection) {
+                  return client.close();
+                }
+              }
+            };
+            client.onmessage = function(evt) {
+              if (alive == null) {
+                alive = true;
+                return callback(app, alive, evt.type);
+              }
+            };
             client.onclose = function(evt) {
-              if (!returned) {
-                returned = true;
-                return callback(app, false, evt.type);
+              if (app.connection || (alive == null)) {
+                alive = false;
+                return callback(app, alive, evt.type);
               }
             };
             client.onerror = function(evt) {
-              if (!returned) {
-                returned = true;
-                return callback(app, false, evt.type);
+              if (app.connection || (alive == null)) {
+                alive = false;
+                return callback(app, alive, evt.type);
               }
             };
-            if (app.data) {
-              client.onmessage = function(evt) {
-                if (!returned) {
-                  returned = true;
-                  return callback(app, true, evt.type);
-                }
-              };
-              return setTimeout(function() {
-                if (!returned) {
-                  returned = true;
-                  return callback(app, true, 'timeout');
-                }
-              }, 10000);
-            } else {
-              return client.onopen = function(evt) {
-                returned = true;
-                return callback(app, true, evt.type);
-              };
-            }
+            return setTimeout(function() {
+              if (alive == null) {
+                alive = false;
+                callback(app, alive, 'timeout');
+                return client.close();
+              }
+            }, 10000);
           } else {
             return callback(app, null, "client not support websocket");
           }

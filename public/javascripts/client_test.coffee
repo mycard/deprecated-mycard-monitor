@@ -14,32 +14,36 @@
         if(window.WebSocket)
           client = new WebSocket(app.url)
 
-          returned = false
+          alive = null
+          client.onopen = (evt)->
+            if !app.data
+              alive = true
+              callback(app, alive, evt.type)
+              client.close() if !app.connection
+
+          client.onmessage = (evt)->
+            if !alive?
+              alive = true
+              callback(app, alive, evt.type)
+
           client.onclose = (evt)->
-            if !returned
-              returned = true
-              callback(app, false, evt.type)
+            if app.connection or !alive?
+              alive = false
+              callback(app, alive, evt.type)
+
           client.onerror = (evt)->
-            if !returned
-              returned = true
-              callback(app, false, evt.type)
+            if app.connection or !alive?
+              alive = false
+              callback(app, alive, evt.type)
 
-          if app.data
-            client.onmessage = (evt)->
-              if !returned
-                returned = true
-                callback(app, true, evt.type)
+          setTimeout ->
+            if !alive?
+              alive = false
+              callback(app, alive, 'timeout')
+              client.close()
 
-            setTimeout ->
-              if !returned
-                returned = true
-                callback(app, true, 'timeout')
-            , 10000
+          , 10000
 
-          else
-            client.onopen = (evt)->
-              returned = true
-              callback(app, true, evt.type)
         else
           callback(app, null, "client not support websocket")
       else
