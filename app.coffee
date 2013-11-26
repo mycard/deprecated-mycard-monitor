@@ -252,7 +252,7 @@ MongoClient.connect settings.database, (err, db)->
               #logs.(app._id for app in apps when !app.alive)
 
             for log in logs
-              log.created_at_humane = moment(log.created_at).tz("Asia/Shanghai").lang('zh-cn').format('YYYY-MM-DD HH:mm (UTCZZ)') #TODO: 本地化时间显示
+              log.created_at_humane = moment(log.created_at).tz("Asia/Shanghai").lang('zh-cn').format('YYYY-MM-DD HH:mm (Z)') #TODO: 本地化时间显示
               for app in apps
                 if app._id.equals log.app
                   log.app = app
