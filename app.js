@@ -388,7 +388,7 @@
               }
               for (_j = 0, _len1 = logs.length; _j < _len1; _j++) {
                 log = logs[_j];
-                log.created_at_humane = log.created_at.toString();
+                log.created_at_humane = moment(log.created_at).tz("Asia/Shanghai").lang('zh-cn').format('YYYY-MM-DD HH:mm (UTCZZ)');
                 for (_k = 0, _len2 = apps.length; _k < _len2; _k++) {
                   app = apps[_k];
                   if (app._id.equals(log.app)) {
