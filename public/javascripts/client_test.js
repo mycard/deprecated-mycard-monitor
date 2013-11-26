@@ -9,11 +9,11 @@
         case 'https':
           return $.get(app.url, function(data, textStatus, jqXHR) {
             return callback(app, true, textStatus);
-          }).fail(function(error, a, b) {
-            if (error.statusText === 'No Transport') {
-              return callback(app, null, error.statusText);
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+            if (errorThrown === 'No Transport') {
+              return callback(app, null, errorThrown);
             } else {
-              return callback(app, false, error.statusText);
+              return callback(app, false, errorThrown);
             }
           });
         case 'ws':

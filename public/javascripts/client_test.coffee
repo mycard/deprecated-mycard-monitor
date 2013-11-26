@@ -5,11 +5,11 @@
       when 'http', 'https'
         $.get app.url, (data, textStatus, jqXHR)->
           callback(app, true, textStatus)
-        .fail (error, a, b)->
-            if(error.statusText == 'No Transport')
-              callback(app, null, error.statusText)
+        .fail (jqXHR, textStatus, errorThrown)->
+            if(errorThrown == 'No Transport')
+              callback(app, null, errorThrown)
             else
-              callback(app, false, error.statusText)
+              callback(app, false, errorThrown)
       when 'ws', 'wss'
         if(window.WebSocket)
           client = new WebSocket(app.url)
