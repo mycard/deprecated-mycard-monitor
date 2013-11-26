@@ -43,7 +43,7 @@
               callback(app, alive, evt.type)
 
           setTimeout ->
-            console.log app.url, 'timeout', evt
+            console.log app.url, 'timeout'
             if !alive?
               alive = false
               callback(app, alive, 'timeout')

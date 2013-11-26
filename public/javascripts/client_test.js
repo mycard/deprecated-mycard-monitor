@@ -55,7 +55,7 @@
               }
             };
             return setTimeout(function() {
-              console.log(app.url, 'timeout', evt);
+              console.log(app.url, 'timeout');
               if (alive == null) {
                 alive = false;
                 callback(app, alive, 'timeout');
