@@ -101,7 +101,7 @@
                 $('<div class="alert alert-success"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_up{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().prependTo('#logs').slideDown()
             }else{
                 $("#client_test_"+app._id).removeClass('btn-default btn-info btn-success btn-danger').addClass('btn-danger')
-                $('<div class="alert alert-danger"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_down{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().prependTo('#logs').slideDown(400)
+                $('<div class="alert alert-danger"><a href="#" class="alert-link">'+app.name+'</a> {{#__}}app_down{{/__}} ('+message+') <small class="pull-right text-muted">{{#__}}client_test{{/__}}</small></div>').hide().prependTo('#logs').slideDown()
             }
         })
     </script>
