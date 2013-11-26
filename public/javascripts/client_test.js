@@ -8,8 +8,10 @@
         case 'http':
         case 'https':
           return $.get(app.url, function(data, textStatus, jqXHR) {
+            console.log(app.url, data, textStatus, jqXHR);
             return callback(app, true, textStatus);
           }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.log(app.url, jqXHR, textStatus, errorThrown);
             if (errorThrown === 'No Transport') {
               return callback(app, null, errorThrown);
             } else {
@@ -22,6 +24,7 @@
             client = new WebSocket(app.url);
             alive = null;
             client.onopen = function(evt) {
+              console.log(app.url, 'open', evt);
               if (!app.data) {
                 alive = true;
                 callback(app, alive, evt.type);
@@ -31,24 +34,28 @@
               }
             };
             client.onmessage = function(evt) {
+              console.log(app.url, 'message', evt);
               if (alive == null) {
                 alive = true;
                 return callback(app, alive, evt.type);
               }
             };
             client.onclose = function(evt) {
+              console.log(app.url, 'close', evt);
               if (app.connection || (alive == null)) {
                 alive = false;
                 return callback(app, alive, evt.type);
               }
             };
             client.onerror = function(evt) {
+              console.log(app.url, 'error', evt);
               if (app.connection || (alive == null)) {
                 alive = false;
                 return callback(app, alive, evt.type);
               }
             };
             return setTimeout(function() {
+              console.log(app.url, 'timeout', evt);
               if (alive == null) {
                 alive = false;
                 callback(app, alive, 'timeout');

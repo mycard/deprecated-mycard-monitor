@@ -4,8 +4,10 @@
     switch url.attr 'protocol'
       when 'http', 'https'
         $.get app.url, (data, textStatus, jqXHR)->
+          console.log app.url, data, textStatus, jqXHR
           callback(app, true, textStatus)
         .fail (jqXHR, textStatus, errorThrown)->
+            console.log app.url, jqXHR, textStatus, errorThrown
             if(errorThrown == 'No Transport')
               callback(app, null, errorThrown)
             else
@@ -16,27 +18,32 @@
 
           alive = null
           client.onopen = (evt)->
+            console.log app.url, 'open', evt
             if !app.data
               alive = true
               callback(app, alive, evt.type)
               client.close() if !app.connection
 
           client.onmessage = (evt)->
+            console.log app.url, 'message', evt
             if !alive?
               alive = true
               callback(app, alive, evt.type)
 
           client.onclose = (evt)->
+            console.log app.url, 'close', evt
             if app.connection or !alive?
               alive = false
               callback(app, alive, evt.type)
 
           client.onerror = (evt)->
+            console.log app.url, 'error', evt
             if app.connection or !alive?
               alive = false
               callback(app, alive, evt.type)
 
           setTimeout ->
+            console.log app.url, 'timeout', evt
             if !alive?
               alive = false
               callback(app, alive, 'timeout')
