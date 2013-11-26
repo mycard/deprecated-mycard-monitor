@@ -84,14 +84,17 @@ body {
     margin-bottom: 0;
 }
 
-#apps {
+#apps_status > .btn-group-justified:last-child {
     margin-bottom: 30px;
 }
-#apps > .btn:first-child {
+
+#apps_status > .btn-group-justified:last-child > .btn {
     border-top-left-radius: 0;
-}
-#apps > .btn:last-child {
     border-top-right-radius: 0;
+}
+
+#apps_status > .btn-group-justified:not(:last-child) > .btn {
+    border-radius: 0;
 }
 
 .brand a:link, .footer a:link, .brand a:visited, .footer a:visited {

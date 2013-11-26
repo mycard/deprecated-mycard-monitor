@@ -43,11 +43,22 @@
         {{/alive}}
         <p>{{#alive}}{{#__}}uptime{{/__}}: {{uptime_humane}}{{/alive}}</p>
     </div>
-    <div id="apps" class="btn-group btn-group-lg btn-group-justified">
-        {{#apps}}
-            <a type="button" class="btn {{#alive}}{{#retries}}btn-warning{{/retries}}{{^retries}}btn-success{{/retries}}{{/alive}}{{^alive}}btn-danger{{/alive}}">{{name}}</a>
-        {{/apps}}
+
+    <div id="apps_status">
+        <div id="apps" class="btn-group btn-group-lg btn-group-justified">
+            {{#apps}}
+                <a type="button" class="btn {{#alive}}{{#retries}}btn-warning{{/retries}}{{^retries}}btn-success{{/retries}}{{/alive}}{{^alive}}btn-danger{{/alive}}">{{name}}</a>
+            {{/apps}}
+        </div>
+
+        {{#client_test_json}}
+        <div id="client_test" class="btn-group btn-group-lg btn-group-justified">
+            {{#client_test}}
+                <a id="client_test_{{_id}}" type="button" class="btn btn-default">{{name}}</a>
+            {{/client_test}}
+        </div>
     </div>
+    {{/client_test_json}}
 
     <div>
         {{#logs}}
@@ -72,5 +83,20 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="javascripts/jquery-2.0.3.min.js"></script>
 <script src="javascripts/bootstrap.min.js"></script>
+{{#client_test_json}}
+    <script src="javascripts/purl.js"></script>
+    <script src="javascripts/client_test.js"></script>
+    <script>
+        client_test({{{client_test_json}}}, function(app, alive, message){
+            if(alive == null){
+                $("#client_test_"+app._id).removeClass('btn-default').addClass('btn-info')
+            }else if(alive){
+                $("#client_test_"+app._id).removeClass('btn-default').addClass('btn-success')
+            }else{
+                $("#client_test_"+app._id).removeClass('btn-default').addClass('btn-danger')
+            }
+        })
+    </script>
+{{/client_test_json}}
 </body>
 </html>

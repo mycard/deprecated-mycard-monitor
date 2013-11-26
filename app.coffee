@@ -261,7 +261,14 @@ MongoClient.connect settings.database, (err, db)->
                 if app._id.equals log.app
                   log.app = app
                   break
-            res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, uptime_humane: uptime_humane, locale: res.getLocale(), __:->res.__}
+
+            if page.client_test and page.client_test.length
+              apps_collection.find(_id: {$in: page.client_test}).toArray (err, client_test)->
+                client_test_json = JSON.stringify client_test
+                res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, client_test: client_test, client_test_json: client_test_json, uptime_humane: uptime_humane, locale: res.getLocale(), __:->res.__}
+
+            else
+              res.render 'page', { page: page, apps: apps, logs: logs, alive: alive, uptime_humane: uptime_humane, locale: res.getLocale(), __:->res.__}
       else
         res.render 'index', { locale: res.getLocale(), __:->res.__ }
   app.get "/favicon.ico", (req, res)->

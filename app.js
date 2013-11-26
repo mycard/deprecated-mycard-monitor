@@ -397,17 +397,41 @@
                   }
                 }
               }
-              return res.render('page', {
-                page: page,
-                apps: apps,
-                logs: logs,
-                alive: alive,
-                uptime_humane: uptime_humane,
-                locale: res.getLocale(),
-                __: function() {
-                  return res.__;
-                }
-              });
+              if (page.client_test && page.client_test.length) {
+                return apps_collection.find({
+                  _id: {
+                    $in: page.client_test
+                  }
+                }).toArray(function(err, client_test) {
+                  var client_test_json;
+                  client_test_json = JSON.stringify(client_test);
+                  return res.render('page', {
+                    page: page,
+                    apps: apps,
+                    logs: logs,
+                    alive: alive,
+                    client_test: client_test,
+                    client_test_json: client_test_json,
+                    uptime_humane: uptime_humane,
+                    locale: res.getLocale(),
+                    __: function() {
+                      return res.__;
+                    }
+                  });
+                });
+              } else {
+                return res.render('page', {
+                  page: page,
+                  apps: apps,
+                  logs: logs,
+                  alive: alive,
+                  uptime_humane: uptime_humane,
+                  locale: res.getLocale(),
+                  __: function() {
+                    return res.__;
+                  }
+                });
+              }
             });
           });
         } else {
