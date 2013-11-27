@@ -112,7 +112,7 @@ MongoClient.connect settings.database, (err, db)->
         logs_collection.insert {app: app._id, alive: alive, message: message, created_at: date}, (err)->
           throw err if err
 
-      else if app.retries >= 5 #下线
+      else if app.retries >= app.max_retries #下线
         console.log "#{app.name} down #{message}"
 
         notice(app, alive, message)
@@ -129,8 +129,9 @@ MongoClient.connect settings.database, (err, db)->
 
 
   #监控逻辑
+  t = 0
   setInterval ->
-    apps_collection.find().each (err, app)->
+    apps_collection.find({ $where: "#{t} % this.interval == 0" } ).each (err, app)->
       throw err if err
       if app
         url_parsed = url.parse app.url
@@ -226,7 +227,7 @@ MongoClient.connect settings.database, (err, db)->
                 req.send()
           else
             throw "unsupported procotol #{app.url}"
-
+    t++
   , settings.interval
 
   #网站逻辑

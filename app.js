@@ -91,7 +91,7 @@
   }
 
   MongoClient.connect(settings.database, function(err, db) {
-    var apps_collection, logs_collection, notice, pages_collection, record;
+    var apps_collection, logs_collection, notice, pages_collection, record, t;
     if (err) {
       throw err;
     }
@@ -175,7 +175,7 @@
               throw err;
             }
           });
-        } else if (app.retries >= 5) {
+        } else if (app.retries >= app.max_retries) {
           console.log("" + app.name + " down " + message);
           notice(app, alive, message);
           apps_collection.update({
@@ -215,8 +215,11 @@
         }
       }
     };
+    t = 0;
     setInterval(function() {
-      return apps_collection.find().each(function(err, app) {
+      apps_collection.find({
+        $where: "" + t + " % this.interval == 0"
+      }).each(function(err, app) {
         var client, dnsquery, key, question, url_parsed, value, _i, _len, _ref, _ref1;
         if (err) {
           throw err;
@@ -342,6 +345,7 @@
           }
         }
       });
+      return t++;
     }, settings.interval);
     app.get("/", function(req, res) {
       return pages_collection.findOne({
