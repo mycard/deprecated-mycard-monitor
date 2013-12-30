@@ -79,7 +79,7 @@ MongoClient.connect settings.database, (err, db)->
             smtp.sendMail
               from: "萌卡监控 <zh99998@gmail.com>"
               to: contact.split(':',2)[1],
-              subject: "#{app.name} #{if alive then '' else '不'}可用 (#{message})"
+              subject: "#{app.name} #{if alive then '' else '不'}可用"
               text: "#{message}"
               html: "#{message}"
           when 'xmpp:'

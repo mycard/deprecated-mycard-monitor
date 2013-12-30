@@ -112,7 +112,7 @@
               _results.push(smtp.sendMail({
                 from: "萌卡监控 <zh99998@gmail.com>",
                 to: contact.split(':', 2)[1],
-                subject: "" + app.name + " " + (alive ? '' : '不') + "可用 (" + message + ")",
+                subject: "" + app.name + " " + (alive ? '' : '不') + "可用",
                 text: "" + message,
                 html: "" + message
               }));
