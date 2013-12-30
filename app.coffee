@@ -181,7 +181,13 @@ MongoClient.connect settings.database, (err, db)->
               else if response.statusCode >= 400 #http成功，但返回了4xx或5xx
                 record(app, false, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
               else #ok
-                record(app, true, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
+                if app.content instanceof RegExp
+                  if body.match(app.content)
+                    record(app, true, body)
+                  else
+                    record(app, false, body)
+                else
+                  record(app, true, "HTTP #{response.statusCode} #{http.STATUS_CODES[response.statusCode]}")
           when 'xmpp:'
           #client = new xmpp.Client()
           #client.on 'error', (error)->

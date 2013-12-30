@@ -282,7 +282,15 @@
                 } else if (response.statusCode >= 400) {
                   return record(app, false, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
                 } else {
-                  return record(app, true, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
+                  if (app.content instanceof RegExp) {
+                    if (body.match(app.content)) {
+                      return record(app, true, body);
+                    } else {
+                      return record(app, false, body);
+                    }
+                  } else {
+                    return record(app, true, "HTTP " + response.statusCode + " " + http.STATUS_CODES[response.statusCode]);
+                  }
                 }
               });
             case 'xmpp:':
